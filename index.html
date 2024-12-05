@@ -8,6 +8,8 @@
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/express/4.17.1/express.min.js"></script>
+<script src="bot-api.js"></script>
+<script src="script.js"></script>
 <script>
     // Configuração do Express
     const app = express();
@@ -82,10 +84,30 @@
                     <button id="sendMessage" disabled>Enviar</button>
                 </div>
             </div>
-        </div>
+            <div class="api-docs">
+                <h3>Como Usar os Bots em Outras Aplicações</h3>
+                <div class="code-example">
+                    <pre><code >// Exemplo de como usar os bots em outras aplicações
+const botApi = window.BotAPI;
+
+// Listar todos os bots disponíveis
+const bots = botApi.getAllBots();
+console.log('Bots disponíveis:', bots);
+
+// Enviar mensagem para um bot específico
+botApi.sendMessage('NomeDoBot', 'Sua mensagem aqui')
+    .then(response => {
+        if (response.success) {
+            console.log('Resposta do bot:', response.response);
+        } else {
+            console.error('Erro:', response.error);
+        }
+    });</code></pre>
+                </div>
+            </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
+
