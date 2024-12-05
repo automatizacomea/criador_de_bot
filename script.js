@@ -275,6 +275,29 @@ function createNewBot() {
     document.getElementById('chatMessages').innerHTML = '';
 }
 
+// Adiciona informações sobre como usar os bots em outras automações
+function addApiInstructions() {
+    const container = document.querySelector('.container');
+    const apiInstructions = document.createElement('div');
+    apiInstructions.className = 'api-instructions';
+    apiInstructions.innerHTML = `
+        <h3>Usar Bots em Outras Automações</h3>
+        <p>Para usar os bots criados em outras automações, use as seguintes rotas API:</p>
+        <ul>
+            <li><strong>GET /api/bots</strong>: Lista todos os bots disponíveis</li>
+            <li><strong>POST /api/use-bot/:id</strong>: Usa um bot específico (substitua :id pelo nome do bot)</li>
+        </ul>
+        <p>Exemplo de uso com curl:</p>
+        <pre>
+curl -X POST http://localhost:3000/api/use-bot/MeuBot -H "Content-Type: application/json" -d '{"message":"Olá, como posso te ajudar?"}'
+        </pre>
+    `;
+    container.appendChild(apiInstructions);
+}
+
+// Chama a função para adicionar as instruções da API
+addApiInstructions();
+
 // Event listeners
 document.getElementById('sendMessage').addEventListener('click', sendMessage);
 document.getElementById('userInput').addEventListener('keypress', function(e) {
