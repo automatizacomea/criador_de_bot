@@ -130,10 +130,16 @@ function loadSavedConfigs() {
             e.stopPropagation();
             showConfirmDialog(index);
         };
-        
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'download-btn';
+        downloadBtn.textContent = 'Baixar Configuração';
+        downloadBtn.onclick = () => downloadConfig(config);
+
         configElement.appendChild(configName);
         configElement.appendChild(updateBtn);
         configElement.appendChild(deleteBtn);
+        configElement.appendChild(downloadBtn);
         container.appendChild(configElement);
     });
 }
@@ -273,6 +279,18 @@ function createNewBot() {
     document.getElementById('sendMessage').disabled = true;
     conversationHistory = [];
     document.getElementById('chatMessages').innerHTML = '';
+}
+
+// Função para baixar configurações
+function downloadConfig(config) {
+    const dataStr = JSON.stringify(config, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${config.name}_config.json`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // Event listeners
