@@ -310,36 +310,3 @@ button:disabled {
     border-radius: 5px;
     overflow-x: auto;
 }
-
-.api-docs {
-    grid-column: 1 / -1;
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    border: 1px solid #e9ecef;
-}
-
-.api-docs h3 {
-    text-align: left;
-    margin-bottom: 15px;
-}
-
-.code-example {
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.code-example pre {
-    margin: 0;
-    padding: 15px;
-    background-color: #e9ecef;
-    overflow-x: auto;
-}
-
-.code-example code {
-    font-family: monospace;
-    font-size: 14px;
-}
-
