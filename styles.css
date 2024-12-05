@@ -287,3 +287,26 @@ button:disabled {
     margin-right: 10px;
 }
 
+.api-instructions {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+}
+
+.api-instructions h3 {
+    margin-bottom: 15px;
+}
+
+.api-instructions ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.api-instructions pre {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
