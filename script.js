@@ -310,3 +310,4 @@ document.getElementById('createNewBot').addEventListener('click', createNewBot);
 
 // Carrega configurações salvas ao iniciar
 loadSavedConfigs();
+
