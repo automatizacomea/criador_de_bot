@@ -51,6 +51,7 @@ function updateKnowledgeBaseList() {
         const titleSpan = document.createElement('span');
         titleSpan.className = 'knowledge-base-title';
         titleSpan.textContent = base.title;
+        titleSpan.onclick = () => showKnowledgeBaseContent(base);
         li.appendChild(titleSpan);
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Excluir';
@@ -62,6 +63,42 @@ function updateKnowledgeBaseList() {
         li.appendChild(deleteButton);
         list.appendChild(li);
     });
+}
+
+// Mostra o conteúdo da base de conhecimento
+function showKnowledgeBaseContent(base) {
+    const modal = document.getElementById('knowledgeBaseModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const downloadButton = document.getElementById('downloadKnowledgeBase');
+
+    modalTitle.textContent = base.title;
+    modalContent.textContent = base.content;
+    modal.style.display = 'block';
+
+    downloadButton.onclick = () => downloadKnowledgeBase(base);
+
+    const closeBtn = document.getElementsByClassName('close')[0];
+    closeBtn.onclick = () => {
+        modal.style.display = 'none';
+    };
+
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    };
+}
+
+// Download da base de conhecimento
+function downloadKnowledgeBase(base) {
+    const blob = new Blob([base.content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${base.title}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // Salva ou atualiza configuração
