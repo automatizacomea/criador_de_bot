@@ -244,6 +244,12 @@ button:disabled {
 
 .file-input {
     margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.file-input input[type="file"] {
+    display: block;
+    margin-top: 5px;
 }
 
 .chat-controls {
@@ -285,4 +291,13 @@ button:disabled {
 .knowledge-base-title {
     font-weight: bold;
     margin-right: 10px;
+}
+
+#downloadConfigTxt {
+    margin-bottom: 10px;
+    background-color: #28a745;
+}
+
+#downloadConfigTxt:hover {
+    background-color: #218838;
 }
