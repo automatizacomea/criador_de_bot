@@ -1,79 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Bots OpenAI</title>
+    <title>Gerenciador de Bots</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Criador de Bots OpenAI</h1>
-        
-        <div class="config-section">
-            <h2>Configurações do Bot</h2>
-            <div class="create-new-bot">
-                <button id="createNewBot">Criar Novo Bot</button>
+        <h1>Gerenciador de Bots</h1>
+
+        <form id="botForm">
+            <div class="form-group">
+                <label for="configName">Nome do Bot</label>
+                <input type="text" id="configName" placeholder="Digite o nome do Bot">
             </div>
-            <form id="botForm">
-                <div class="form-group">
-                    <label for="configName">Nome da Configuração:</label>
-                    <input type="text" id="configName" required placeholder="Meu Bot">
-                </div>
+            <div class="form-group">
+                <label for="apiKey">Chave de API</label>
+                <input type="text" id="apiKey" placeholder="Digite sua chave de API">
+            </div>
+            <div class="form-group">
+                <label for="systemPrompt">Prompt do Sistema</label>
+                <textarea id="systemPrompt" placeholder="Escreva o prompt do sistema"></textarea>
+            </div>
+        </form>
 
-                <div class="form-group">
-                    <label for="apiKey">Chave da API OpenAI:</label>
-                    <input type="text" id="apiKey" required placeholder="sk-...">
-                </div>
+        <div class="knowledge-base">
+            <h2>Base de Conhecimento</h2>
+            <div class="form-group">
+                <label for="knowledgeBaseTitle">Título</label>
+                <input type="text" id="knowledgeBaseTitle" placeholder="Digite o título da base de conhecimento">
+            </div>
+            <textarea id="knowledgeText" placeholder="Escreva o conteúdo da base de conhecimento"></textarea>
+            <div class="file-input">
+                <input type="file" id="knowledgeFile" accept=".txt,.pdf">
+            </div>
+            <button id="addKnowledgeBase">Adicionar Base de Conhecimento</button>
+        </div>
 
-                <div class="form-group">
-                    <label for="systemPrompt">Prompt do Sistema:</label>
-                    <textarea id="systemPrompt" placeholder="Defina o comportamento do seu bot..."></textarea>
-                </div>
+        <ul id="knowledgeBaseList" class="knowledge-base-list"></ul>
 
-                <div class="knowledge-base">
-                    <h3>Base de Conhecimento</h3>
-                    <div class="form-group">
-                        <label for="knowledgeBaseTitle">Título da Base de Conhecimento:</label>
-                        <input type="text" id="knowledgeBaseTitle" placeholder="Ex: História do Brasil">
-                    </div>
-                    <div class="file-input">
-                        <label for="knowledgeFile">Carregar arquivo (TXT ou PDF):</label>
-                        <input type="file" id="knowledgeFile" accept=".txt,.pdf">
-                    </div>
-                    <div>
-                        <label for="knowledgeText">Ou insira o texto diretamente:</label>
-                        <textarea id="knowledgeText" placeholder="Insira sua base de conhecimento aqui..."></textarea>
-                    </div>
-                    <button type="button" id="addKnowledgeBase">Adicionar Base de Conhecimento</button>
-                    <ul id="knowledgeBaseList" class="knowledge-base-list"></ul>
-                </div>
-
-                <button type="submit">Salvar Configuração</button>
-            </form>
-
-            <div class="saved-configs">
-                <h3>Configurações Salvas</h3>
-                <div id="savedConfigsList"></div>
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Digite sua mensagem">
+                <button id="sendMessage" disabled>Enviar</button>
             </div>
         </div>
 
-        <div class="chat-section">
-            <h2>Teste do Bot</h2>
-            <div class="chat-controls">
-                <button id="resetChat">Resetar Conversa</button>
-            </div>
-            <div class="chat-container">
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input">
-                    <input type="text" id="userInput" placeholder="Digite sua mensagem...">
-                    <button id="sendMessage" disabled>Enviar</button>
-                </div>
-            </div>
+        <div class="chat-controls">
+            <button id="resetChat">Resetar Conversa</button>
+            <button id="createNewBot">Criar Novo Bot</button>
+            <button id="download-txt">Baixar Bot (.txt)</button>
+            <input type="file" id="upload-json" accept=".json" class="file-input">
         </div>
+
+        <div id="savedConfigsList" class="saved-configs"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
