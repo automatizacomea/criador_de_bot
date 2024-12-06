@@ -144,6 +144,21 @@ function loadSavedConfigs() {
     });
 }
 
+// Carrega configuração de um arquivo JSON
+function loadConfigFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const config = JSON.parse(e.target.result);
+            loadConfig(config);
+            alert('Configuração carregada com sucesso!');
+        } catch (error) {
+            alert('Erro ao carregar o arquivo: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
 // Carrega uma configuração
 function loadConfig(config) {
     document.getElementById('configName').value = config.name;
@@ -282,13 +297,29 @@ function createNewBot() {
 }
 
 // Função para baixar configurações
-function downloadConfig(config) {
-    const dataStr = JSON.stringify(config, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
+function downloadConfig(config, format = 'json') {
+    let dataStr, mimeType, fileExtension;
+    
+    if (format === 'txt') {
+        dataStr = Object.entries(config).map(([key, value]) => {
+            if (key === 'knowledgeBases') {
+                return `${key}:\n${value.map(kb => `  ${kb.title}:\n    ${kb.content}`).join('\n')}`;
+            }
+            return `${key}: ${JSON.stringify(value)}`;
+        }).join('\n');
+        mimeType = 'text/plain';
+        fileExtension = 'txt';
+    } else {
+        dataStr = JSON.stringify(config, null, 2);
+        mimeType = 'application/json';
+        fileExtension = 'json';
+    }
+
+    const blob = new Blob([dataStr], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${config.name}_config.json`;
+    a.download = `${config.name}_config.${fileExtension}`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -305,3 +336,20 @@ document.getElementById('createNewBot').addEventListener('click', createNewBot);
 
 // Carrega configurações salvas ao iniciar
 loadSavedConfigs();
+
+// Event listener para carregar configuração de arquivo
+document.getElementById('loadConfigFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        loadConfigFromFile(file);
+    }
+});
+
+// Event listener para baixar configuração como TXT
+document.getElementById('downloadConfigTxt').addEventListener('click', function() {
+    if (currentConfig) {
+        downloadConfig(currentConfig, 'txt');
+    } else {
+        alert('Nenhuma configuração selecionada para download.');
+    }
+});
