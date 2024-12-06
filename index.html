@@ -1,79 +1,40 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Bots OpenAI</title>
-    <link rel="stylesheet" href="styles.css">
+<title>Configurações do Bot</title>
+<style>
+.config-section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.saved-configs {
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.file-input {
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Criador de Bots OpenAI</h1>
-        
-        <div class="config-section">
-            <h2>Configurações do Bot</h2>
-            <div class="create-new-bot">
-                <button id="createNewBot">Criar Novo Bot</button>
-            </div>
-            <form id="botForm">
-                <div class="form-group">
-                    <label for="configName">Nome da Configuração:</label>
-                    <input type="text" id="configName" required placeholder="Meu Bot">
-                </div>
 
-                <div class="form-group">
-                    <label for="apiKey">Chave da API OpenAI:</label>
-                    <input type="text" id="apiKey" required placeholder="sk-...">
-                </div>
+<div class="config-section">
+  <h2>Configurações do Bot</h2>
+  <div class="file-input">
+    <label for="loadConfigFile">Carregar configuração (JSON):</label>
+    <input type="file" id="loadConfigFile" accept=".json">
+  </div>
+  <!-- Rest of the configuration options -->
+</div>
 
-                <div class="form-group">
-                    <label for="systemPrompt">Prompt do Sistema:</label>
-                    <textarea id="systemPrompt" placeholder="Defina o comportamento do seu bot..."></textarea>
-                </div>
+<div class="saved-configs">
+  <h3>Configurações Salvas</h3>
+  <button id="downloadConfigTxt">Baixar Configuração (TXT)</button>
+  <!-- List of saved configurations -->
+</div>
 
-                <div class="knowledge-base">
-                    <h3>Base de Conhecimento</h3>
-                    <div class="form-group">
-                        <label for="knowledgeBaseTitle">Título da Base de Conhecimento:</label>
-                        <input type="text" id="knowledgeBaseTitle" placeholder="Ex: História do Brasil">
-                    </div>
-                    <div class="file-input">
-                        <label for="knowledgeFile">Carregar arquivo (TXT ou PDF):</label>
-                        <input type="file" id="knowledgeFile" accept=".txt,.pdf">
-                    </div>
-                    <div>
-                        <label for="knowledgeText">Ou insira o texto diretamente:</label>
-                        <textarea id="knowledgeText" placeholder="Insira sua base de conhecimento aqui..."></textarea>
-                    </div>
-                    <button type="button" id="addKnowledgeBase">Adicionar Base de Conhecimento</button>
-                    <ul id="knowledgeBaseList" class="knowledge-base-list"></ul>
-                </div>
-
-                <button type="submit">Salvar Configuração</button>
-            </form>
-
-            <div class="saved-configs">
-                <h3>Configurações Salvas</h3>
-                <div id="savedConfigsList"></div>
-            </div>
-        </div>
-
-        <div class="chat-section">
-            <h2>Teste do Bot</h2>
-            <div class="chat-controls">
-                <button id="resetChat">Resetar Conversa</button>
-            </div>
-            <div class="chat-container">
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input">
-                    <input type="text" id="userInput" placeholder="Digite sua mensagem...">
-                    <button id="sendMessage" disabled>Enviar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
