@@ -111,7 +111,7 @@ document.getElementById('botForm').addEventListener('submit', async function(e) 
         model: 'gpt-4o-mini-2024-07-18', // Modelo fixo
         systemPrompt: document.getElementById('systemPrompt').value,
         temperature: 0.7, // Temperatura fixa
-        maxTokens: 150, // Tokens fixos
+        maxTokens: 300, // Tokens fixos
         knowledgeBases: knowledgeBases
     };
 
