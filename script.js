@@ -1,307 +1,155 @@
+// Variáveis globais
 let currentConfig = null;
 let conversationHistory = [];
 let knowledgeBases = [];
 
-// Lida com o carregamento de arquivos
-document.getElementById('knowledgeFile').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.type === 'text/plain') {
-        const text = await file.text();
-        document.getElementById('knowledgeText').value = text;
-    } else if (file.type === 'application/pdf') {
-        const reader = new FileReader();
-        reader.onload = async function(event) {
-            const typedarray = new Uint8Array(event.target.result);
-            const pdf = await pdfjsLib.getDocument(typedarray).promise;
-            let fullText = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                fullText += textContent.items.map(item => item.str).join(' ') + '\n';
-            }
-            document.getElementById('knowledgeText').value = fullText;
-        };
-        reader.readAsArrayBuffer(file);
-    }
-});
-
-// Adiciona base de conhecimento
-document.getElementById('addKnowledgeBase').addEventListener('click', function() {
-    const knowledgeTitle = document.getElementById('knowledgeBaseTitle').value.trim();
-    const knowledgeText = document.getElementById('knowledgeText').value.trim();
-    if (knowledgeTitle && knowledgeText) {
-        knowledgeBases.push({ title: knowledgeTitle, content: knowledgeText });
-        updateKnowledgeBaseList();
-        document.getElementById('knowledgeBaseTitle').value = '';
-        document.getElementById('knowledgeText').value = '';
-    } else {
-        alert('Por favor, preencha o título e o conteúdo da base de conhecimento.');
-    }
-});
-
-// Atualiza a lista de bases de conhecimento
+// Atualizar a lista de bases de conhecimento
 function updateKnowledgeBaseList() {
-    const list = document.getElementById('knowledgeBaseList');
-    list.innerHTML = '';
-    knowledgeBases.forEach((base, index) => {
-        const li = document.createElement('li');
-        li.className = 'knowledge-base-item';
-        const titleSpan = document.createElement('span');
-        titleSpan.className = 'knowledge-base-title';
-        titleSpan.textContent = base.title;
-        li.appendChild(titleSpan);
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
-        deleteButton.className = 'delete-btn';
-        deleteButton.onclick = () => {
+    const list = document.getElementById("knowledgeBaseList");
+    list.innerHTML = "";
+    knowledgeBases.forEach((kb, index) => {
+        const li = document.createElement("li");
+        li.className = "knowledge-base-item";
+
+        const title = document.createElement("span");
+        title.className = "knowledge-base-title";
+        title.textContent = kb.title;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Excluir";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.addEventListener("click", () => {
             knowledgeBases.splice(index, 1);
             updateKnowledgeBaseList();
-        };
-        li.appendChild(deleteButton);
+        });
+
+        li.appendChild(title);
+        li.appendChild(deleteBtn);
         list.appendChild(li);
     });
 }
 
-// Salva ou atualiza configuração
-document.getElementById('botForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const config = {
-        name: document.getElementById('configName').value,
-        apiKey: document.getElementById('apiKey').value,
-        model: 'gpt-4o-mini-2024-07-18', // Modelo fixo
-        systemPrompt: document.getElementById('systemPrompt').value,
-        temperature: 0.7, // Temperatura fixa
-        maxTokens: 150, // Tokens fixos
-        knowledgeBases: knowledgeBases
-    };
+// Adicionar base de conhecimento
+document.getElementById("addKnowledgeBase").addEventListener("click", () => {
+    const title = document.getElementById("knowledgeBaseTitle").value.trim();
+    const content = document.getElementById("knowledgeText").value.trim();
 
-    // Verifica se é uma atualização ou uma nova configuração
-    const savedConfigs = JSON.parse(localStorage.getItem('botConfigs') || '[]');
-    const existingConfigIndex = savedConfigs.findIndex(c => c.name === config.name);
+    if (title && content) {
+        knowledgeBases.push({ title, content });
+        updateKnowledgeBaseList();
 
-    if (existingConfigIndex !== -1) {
-        // Atualiza a configuração existente
-        savedConfigs[existingConfigIndex] = config;
-        alert('Configuração atualizada com sucesso!');
+        // Limpar campos
+        document.getElementById("knowledgeBaseTitle").value = "";
+        document.getElementById("knowledgeText").value = "";
     } else {
-        // Adiciona nova configuração
-        savedConfigs.push(config);
-        alert('Nova configuração salva com sucesso!');
+        alert("Por favor, preencha o título e o conteúdo.");
     }
-
-    localStorage.setItem('botConfigs', JSON.stringify(savedConfigs));
-
-    currentConfig = config;
-    document.getElementById('sendMessage').disabled = false;
-    
-    loadSavedConfigs();
 });
 
-// Carrega configurações salvas
-function loadSavedConfigs() {
-    const savedConfigs = JSON.parse(localStorage.getItem('botConfigs') || '[]');
-    const container = document.getElementById('savedConfigsList');
-    container.innerHTML = '';
-
-    savedConfigs.forEach((config, index) => {
-        const configElement = document.createElement('div');
-        configElement.className = 'saved-config-item';
-        
-        const configName = document.createElement('span');
-        configName.className = 'config-name';
-        configName.textContent = config.name;
-        configName.onclick = () => loadConfig(config);
-        
-        const updateBtn = document.createElement('button');
-        updateBtn.className = 'update-btn';
-        updateBtn.textContent = 'Atualizar';
-        updateBtn.onclick = (e) => {
-            e.stopPropagation();
-            loadConfig(config);
-        };
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = 'Excluir';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            showConfirmDialog(index);
-        };
-
-        const downloadBtn = document.createElement('button');
-        downloadBtn.className = 'download-btn';
-        downloadBtn.textContent = 'Baixar Configuração';
-        downloadBtn.onclick = () => downloadConfig(config);
-
-        configElement.appendChild(configName);
-        configElement.appendChild(updateBtn);
-        configElement.appendChild(deleteBtn);
-        configElement.appendChild(downloadBtn);
-        container.appendChild(configElement);
-    });
-}
-
-// Carrega uma configuração
-function loadConfig(config) {
-    document.getElementById('configName').value = config.name;
-    document.getElementById('apiKey').value = config.apiKey;
-    document.getElementById('systemPrompt').value = config.systemPrompt;
-    knowledgeBases = config.knowledgeBases || [];
-    updateKnowledgeBaseList();
-
-    currentConfig = config;
-    document.getElementById('sendMessage').disabled = false;
+// Resetar conversa
+document.getElementById("resetChat").addEventListener("click", () => {
+    const chatMessages = document.getElementById("chatMessages");
+    chatMessages.innerHTML = "";
     conversationHistory = [];
-    document.getElementById('chatMessages').innerHTML = '';
-}
+    document.getElementById("sendMessage").disabled = true;
+});
 
-// Envia mensagem para o bot
-async function sendMessage() {
-    const userInput = document.getElementById('userInput');
-    const message = userInput.value.trim();
-    if (!message) return;
+// Criar novo bot
+document.getElementById("createNewBot").addEventListener("click", () => {
+    if (confirm("Tem certeza de que deseja criar um novo bot? Todos os dados atuais serão perdidos.")) {
+        currentConfig = null;
+        knowledgeBases = [];
+        conversationHistory = [];
 
-    // Adiciona mensagem do usuário ao chat
-    addMessageToChat('user', message);
-    userInput.value = '';
+        document.getElementById("configName").value = "";
+        document.getElementById("apiKey").value = "";
+        document.getElementById("systemPrompt").value = "";
+        updateKnowledgeBaseList();
 
-    // Prepara o histórico da conversa
-    conversationHistory.push({
-        role: "user",
-        content: message
-    });
-
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentConfig.apiKey}`
-            },
-            body: JSON.stringify({
-                model: currentConfig.model,
-                messages: [
-                    {
-                        role: "system",
-                        content: `${currentConfig.systemPrompt}\n\nBases de Conhecimento:\n${currentConfig.knowledgeBases.map(kb => `${kb.title}:\n${kb.content}`).join('\n\n')}`
-                    },
-                    ...conversationHistory
-                ],
-                temperature: currentConfig.temperature,
-                max_tokens: currentConfig.maxTokens
-            })
-        });
-
-        const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error.message);
-        }
-
-        const botResponse = data.choices[0].message.content;
-        conversationHistory.push({
-            role: "assistant",
-            content: botResponse
-        });
-        addMessageToChat('bot', botResponse);
-    } catch (error) {
-        addMessageToChat('bot', `Erro: ${error.message}`);
+        alert("Novo bot criado com sucesso.");
     }
-}
+});
 
-// Adiciona mensagem ao chat
-function addMessageToChat(role, content) {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${role}-message`;
-    messageDiv.textContent = content;
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+// Enviar mensagem no chat
+document.getElementById("userInput").addEventListener("input", (e) => {
+    const sendMessageBtn = document.getElementById("sendMessage");
+    sendMessageBtn.disabled = !e.target.value.trim();
+});
 
-// Mostra diálogo de confirmação
-function showConfirmDialog(index) {
-    const dialog = document.createElement('div');
-    dialog.className = 'confirm-dialog';
-    dialog.innerHTML = `
-        <p>Tem certeza que deseja excluir esta configuração?</p>
-        <div class="dialog-buttons">
-            <button class="cancel-btn">Cancelar</button>
-            <button class="confirm-btn">Confirmar</button>
-        </div>
+document.getElementById("sendMessage").addEventListener("click", () => {
+    const userInput = document.getElementById("userInput");
+    const message = userInput.value.trim();
+
+    if (message) {
+        const chatMessages = document.getElementById("chatMessages");
+
+        // Adicionar mensagem do usuário
+        const userMessage = document.createElement("div");
+        userMessage.className = "message user-message";
+        userMessage.textContent = message;
+        chatMessages.appendChild(userMessage);
+
+        // Simular resposta do bot
+        const botMessage = document.createElement("div");
+        botMessage.className = "message bot-message";
+        botMessage.textContent = `Resposta ao: "${message}"`;
+        chatMessages.appendChild(botMessage);
+
+        conversationHistory.push({ user: message, bot: botMessage.textContent });
+        userInput.value = "";
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+});
+
+// Baixar o Bot em formato TXT
+document.getElementById("download-txt").addEventListener("click", () => {
+    const botData = {
+        name: currentConfig?.name || "BotSemNome",
+        apiKey: currentConfig?.apiKey || "",
+        systemPrompt: currentConfig?.systemPrompt || "",
+        knowledgeBases: knowledgeBases,
+    };
+
+    const textContent = `
+Bot: ${botData.name}
+API Key: ${botData.apiKey}
+Prompt do Sistema:
+${botData.systemPrompt}
+
+Base de Conhecimento:
+${botData.knowledgeBases
+        .map(kb => `Título: ${kb.title}\nConteúdo: ${kb.content}`)
+        .join("\n\n")}
     `;
 
-    const overlay = document.createElement('div');
-    overlay.className = 'dialog-overlay';
+    const blob = new Blob([textContent.trim()], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${botData.name || "Bot"}.txt`;
+    link.click();
+});
 
-    document.body.appendChild(overlay);
-    document.body.appendChild(dialog);
+// Carregar um Bot de um arquivo JSON
+document.getElementById("upload-json").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const botData = JSON.parse(e.target.result);
 
-    dialog.querySelector('.cancel-btn').onclick = () => {
-        document.body.removeChild(overlay);
-        document.body.removeChild(dialog);
-    };
+                // Atualizar configurações
+                document.getElementById('configName').value = botData.name || '';
+                document.getElementById('apiKey').value = botData.apiKey || '';
+                document.getElementById('systemPrompt').value = botData.systemPrompt || '';
+                knowledgeBases = botData.knowledgeBases || [];
 
-    dialog.querySelector('.confirm-btn').onclick = () => {
-        deleteConfig(index);
-        document.body.removeChild(overlay);
-        document.body.removeChild(dialog);
-    };
-}
-
-// Deleta configuração
-function deleteConfig(index) {
-    const savedConfigs = JSON.parse(localStorage.getItem('botConfigs') || '[]');
-    savedConfigs.splice(index, 1);
-    localStorage.setItem('botConfigs', JSON.stringify(savedConfigs));
-    loadSavedConfigs();
-}
-
-// Reseta a conversa
-function resetChat() {
-    conversationHistory = [];
-    document.getElementById('chatMessages').innerHTML = '';
-    addMessageToChat('bot', 'A conversa foi resetada. Como posso ajudar?');
-}
-
-// Cria um novo bot
-function createNewBot() {
-    document.getElementById('configName').value = '';
-    document.getElementById('apiKey').value = '';
-    document.getElementById('systemPrompt').value = '';
-    document.getElementById('knowledgeBaseTitle').value = '';
-    document.getElementById('knowledgeText').value = '';
-    knowledgeBases = [];
-    updateKnowledgeBaseList();
-    currentConfig = null;
-    document.getElementById('sendMessage').disabled = true;
-    conversationHistory = [];
-    document.getElementById('chatMessages').innerHTML = '';
-}
-
-// Função para baixar configurações
-function downloadConfig(config) {
-    const dataStr = JSON.stringify(config, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${config.name}_config.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// Event listeners
-document.getElementById('sendMessage').addEventListener('click', sendMessage);
-document.getElementById('userInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        sendMessage();
+                updateKnowledgeBaseList();
+                alert(`Bot "${botData.name}" carregado com sucesso!`);
+            } catch (error) {
+                alert("Erro: O arquivo selecionado não é um JSON válido.");
+            }
+        };
+        reader.readAsText(file);
     }
 });
-document.getElementById('resetChat').addEventListener('click', resetChat);
-document.getElementById('createNewBot').addEventListener('click', createNewBot);
-
-// Carrega configurações salvas ao iniciar
-loadSavedConfigs();
