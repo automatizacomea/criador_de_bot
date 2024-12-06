@@ -324,6 +324,24 @@ function downloadConfig(config, format = 'json') {
     URL.revokeObjectURL(url);
 }
 
+// Função para baixar configurações como TXT
+function downloadConfigAsTxt(config) {
+    const dataStr = Object.entries(config).map(([key, value]) => {
+        if (key === 'knowledgeBases') {
+            return `${key}:\n${value.map(kb => `  ${kb.title}:\n    ${kb.content}`).join('\n')}`;
+        }
+        return `${key}: ${JSON.stringify(value)}`;
+    }).join('\n');
+
+    const blob = new Blob([dataStr], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${config.name}_config.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 // Event listeners
 document.getElementById('sendMessage').addEventListener('click', sendMessage);
 document.getElementById('userInput').addEventListener('keypress', function(e) {
@@ -348,7 +366,7 @@ document.getElementById('loadConfigFile').addEventListener('change', function(e)
 // Event listener para baixar configuração como TXT
 document.getElementById('downloadConfigTxt').addEventListener('click', function() {
     if (currentConfig) {
-        downloadConfig(currentConfig, 'txt');
+        downloadConfigAsTxt(currentConfig);
     } else {
         alert('Nenhuma configuração selecionada para download.');
     }
