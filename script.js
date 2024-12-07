@@ -51,7 +51,6 @@ function updateKnowledgeBaseList() {
         const titleSpan = document.createElement('span');
         titleSpan.className = 'knowledge-base-title';
         titleSpan.textContent = base.title;
-        titleSpan.onclick = () => showKnowledgeBaseContent(base);
         li.appendChild(titleSpan);
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Excluir';
@@ -65,42 +64,6 @@ function updateKnowledgeBaseList() {
     });
 }
 
-// Mostra o conteúdo da base de conhecimento
-function showKnowledgeBaseContent(base) {
-    const modal = document.getElementById('knowledgeBaseModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalContent = document.getElementById('modalContent');
-    const downloadButton = document.getElementById('downloadKnowledgeBase');
-
-    modalTitle.textContent = base.title;
-    modalContent.textContent = base.content;
-    modal.style.display = 'block';
-
-    downloadButton.onclick = () => downloadKnowledgeBase(base);
-
-    const closeBtn = document.getElementsByClassName('close')[0];
-    closeBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
-
-    window.onclick = (event) => {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    };
-}
-
-// Download da base de conhecimento
-function downloadKnowledgeBase(base) {
-    const blob = new Blob([base.content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${base.title}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
 // Salva ou atualiza configuração
 document.getElementById('botForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -111,7 +74,7 @@ document.getElementById('botForm').addEventListener('submit', async function(e) 
         model: 'gpt-4o-mini-2024-07-18', // Modelo fixo
         systemPrompt: document.getElementById('systemPrompt').value,
         temperature: 0.7, // Temperatura fixa
-        maxTokens: 300, // Tokens fixos
+        maxTokens: 150, // Tokens fixos
         knowledgeBases: knowledgeBases
     };
 
@@ -179,21 +142,6 @@ function loadSavedConfigs() {
         configElement.appendChild(downloadBtn);
         container.appendChild(configElement);
     });
-}
-
-// Carrega configuração de um arquivo JSON
-function loadConfigFromFile(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const config = JSON.parse(e.target.result);
-            loadConfig(config);
-            alert('Configuração carregada com sucesso!');
-        } catch (error) {
-            alert('Erro ao carregar o arquivo: ' + error.message);
-        }
-    };
-    reader.readAsText(file);
 }
 
 // Carrega uma configuração
@@ -334,47 +282,13 @@ function createNewBot() {
 }
 
 // Função para baixar configurações
-function downloadConfig(config, format = 'json') {
-    let dataStr, mimeType, fileExtension;
-    
-    if (format === 'txt') {
-        dataStr = Object.entries(config).map(([key, value]) => {
-            if (key === 'knowledgeBases') {
-                return `${key}:\n${value.map(kb => `  ${kb.title}:\n    ${kb.content}`).join('\n')}`;
-            }
-            return `${key}: ${JSON.stringify(value)}`;
-        }).join('\n');
-        mimeType = 'text/plain';
-        fileExtension = 'txt';
-    } else {
-        dataStr = JSON.stringify(config, null, 2);
-        mimeType = 'application/json';
-        fileExtension = 'json';
-    }
-
-    const blob = new Blob([dataStr], { type: mimeType });
+function downloadConfig(config) {
+    const dataStr = JSON.stringify(config, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${config.name}_config.${fileExtension}`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// Função para baixar configurações como TXT
-function downloadConfigAsTxt(config) {
-    const dataStr = Object.entries(config).map(([key, value]) => {
-        if (key === 'knowledgeBases') {
-            return `${key}:\n${value.map(kb => `  ${kb.title}:\n    ${kb.content}`).join('\n')}`;
-        }
-        return `${key}: ${JSON.stringify(value)}`;
-    }).join('\n');
-
-    const blob = new Blob([dataStr], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${config.name}_config.txt`;
+    a.download = `${config.name}_config.json`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -391,113 +305,3 @@ document.getElementById('createNewBot').addEventListener('click', createNewBot);
 
 // Carrega configurações salvas ao iniciar
 loadSavedConfigs();
-
-// Event listener para carregar configuração de arquivo
-document.getElementById('loadConfigFile').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        loadConfigFromFile(file);
-    }
-});
-
-// Event listener para baixar configuração como TXT
-document.getElementById('downloadConfigTxt').addEventListener('click', function() {
-    if (currentConfig) {
-        downloadConfigAsTxt(currentConfig);
-    } else {
-        alert('Nenhuma configuração selecionada para download.');
-    }
-});
-
-// Função para gerar comando cURL
-function generateCurlCommand(config) {
-    const messages = [
-        {
-            role: "system",
-            content: `${config.systemPrompt}\n\nBases de Conhecimento:\n${config.knowledgeBases.map(kb => `${kb.title}:\n${kb.content}`).join('\n\n')}`
-        }
-    ];
-
-    return `curl https://api.openai.com/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${config.apiKey}" \
-  -d '{
-    "model": "${config.model}",
-    "messages": ${JSON.stringify(messages)},
-    "temperature": ${config.temperature},
-    "max_tokens": ${config.maxTokens}
-  }'`;
-}
-
-// Função para copiar comando cURL
-function copyCurlCommand() {
-    if (currentConfig) {
-        const curlCommand = generateCurlCommand(currentConfig);
-        navigator.clipboard.writeText(curlCommand)
-            .then(() => alert('Comando cURL copiado para a área de transferência!'))
-            .catch(err => alert('Erro ao copiar comando: ' + err));
-    }
-}
-
-// Adiciona botões dinamicamente em cada configuração salva
-function loadSavedConfigs() {
-    const savedConfigs = JSON.parse(localStorage.getItem('botConfigs') || '[]');
-    const container = document.getElementById('savedConfigsList');
-    container.innerHTML = '';
-
-    savedConfigs.forEach((config, index) => {
-        const configElement = document.createElement('div');
-        configElement.className = 'saved-config-item';
-        
-        // Nome da configuração
-        const configName = document.createElement('span');
-        configName.className = 'config-name';
-        configName.textContent = config.name;
-        configName.onclick = () => loadConfig(config);
-        
-        const exportCurlBtn = document.createElement('button');
-        exportCurlBtn.className = 'export-curl-btn';
-        exportCurlBtn.textContent = 'Exportar cURL';
-        exportCurlBtn.onclick = () => {
-            const curlCommand = generateCurlCommand(config);
-            showKnowledgeBaseContent({ title: `Comando cURL para ${config.name}`, content: curlCommand });
-        };
-
-        const viewKnowledgeBtn = document.createElement('button');
-        viewKnowledgeBtn.className = 'view-knowledge-btn';
-        viewKnowledgeBtn.textContent = 'Ver Base de Conhecimento';
-        viewKnowledgeBtn.onclick = () => {
-            const content = config.knowledgeBases.map(kb => `${kb.title}:\n${kb.content}\n---\n`).join('\n');
-            showKnowledgeBaseContent({ title: `Base de Conhecimento - ${config.name}`, content: content });
-        };
-
-        configElement.appendChild(configName);
-        configElement.appendChild(exportCurlBtn);
-        configElement.appendChild(viewKnowledgeBtn);
-        container.appendChild(configElement);
-    });
-}
-
-// Mostra o conteúdo em um modal
-function showKnowledgeBaseContent(base) {
-    const modal = document.getElementById('knowledgeBaseModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalContent = document.getElementById('modalContent');
-
-    modalTitle.textContent = base.title;
-    modalContent.textContent = base.content;
-    modal.style.display = 'block';
-
-    document.querySelector('.close').onclick = () => {
-        modal.style.display = 'none';
-    };
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-}
-
-// Vincula o botão de copiar cURL
-document.getElementById('copyCurlCommand').addEventListener('click', copyCurlCommand);
