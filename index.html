@@ -54,6 +54,10 @@
 
             <div class="saved-configs">
                 <h3>Configurações Salvas</h3>
+                <div class="file-input">
+                    <label for="loadConfigFile">Carregar configuração (JSON):</label>
+                    <input type="file" id="loadConfigFile" accept=".json">
+                </div>
                 <div id="savedConfigsList"></div>
             </div>
         </div>
@@ -73,7 +77,18 @@
         </div>
     </div>
 
+    <!-- Modal para visualização de conteúdo -->
+    <div id="knowledgeBaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="modalContent"></div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
