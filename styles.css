@@ -22,90 +22,6 @@ body {
     gap: 20px;
 }
 
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1000;
-}
-
-.modal-content {
-    position: relative;
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 8px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.modal-body {
-    max-height: 400px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: black;
-}
-
-.curl-btn {
-    background: #6610f2;
-}
-
-.curl-btn:hover {
-    background: #520dc2;
-}
-
-/* Restante dos estilos permanecem os mesmos */
-
- {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-body {
-    background: #f0f2f5;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
@@ -248,7 +164,7 @@ button:disabled {
     flex-grow: 1;
 }
 
-.delete-btn, .update-btn {
+.delete-btn, .update-btn, .curl-btn {
     color: white;
     padding: 5px 10px;
     border: none;
@@ -267,12 +183,20 @@ button:disabled {
     background: #28a745;
 }
 
+.curl-btn {
+    background: #6610f2;
+}
+
 .delete-btn:hover {
     background: #c82333;
 }
 
 .update-btn:hover {
     background: #218838;
+}
+
+.curl-btn:hover {
+    background: #520dc2;
 }
 
 .confirm-dialog {
@@ -328,6 +252,12 @@ button:disabled {
 
 .file-input {
     margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.file-input input[type="file"] {
+    display: block;
+    margin-top: 5px;
 }
 
 .chat-controls {
@@ -369,4 +299,55 @@ button:disabled {
 .knowledge-base-title {
     font-weight: bold;
     margin-right: 10px;
+    cursor: pointer;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: black;
 }
