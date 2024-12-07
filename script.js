@@ -1,3 +1,76 @@
+// Atualiza a lista de bases de conhecimento
+function updateKnowledgeBaseList() {
+    const list = document.getElementById('knowledgeBaseList');
+    list.innerHTML = '';
+    knowledgeBases.forEach((base, index) => {
+        const li = document.createElement('li');
+        li.className = 'knowledge-base-item';
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'knowledge-base-title';
+        titleSpan.textContent = base.title;
+        titleSpan.onclick = () => showModal(base.title, base.content);
+        li.appendChild(titleSpan);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Excluir';
+        deleteButton.className = 'delete-btn';
+        deleteButton.onclick = () => {
+            knowledgeBases.splice(index, 1);
+            updateKnowledgeBaseList();
+        };
+        li.appendChild(deleteButton);
+        
+        list.appendChild(li);
+    });
+}
+
+// Carrega configurações salvas
+function loadSavedConfigs() {
+    const savedConfigs = getSavedConfigs();
+    const container = document.getElementById('savedConfigsList');
+    container.innerHTML = '';
+
+    savedConfigs.forEach((config, index) => {
+        const configElement = document.createElement('div');
+        configElement.className = 'saved-config-item';
+        
+        const configName = document.createElement('span');
+        configName.className = 'config-name';
+        configName.textContent = config.name;
+        configName.onclick = () => loadConfig(config);
+        
+        const viewCurlBtn = document.createElement('button');
+        viewCurlBtn.textContent = 'Ver CURL';
+        viewCurlBtn.className = 'curl-btn';
+        viewCurlBtn.onclick = (e) => {
+            e.stopPropagation();
+            showModal('Comando CURL do Bot', generateCurlCommand(config));
+        };
+
+        const updateBtn = document.createElement('button');
+        updateBtn.className = 'update-btn';
+        updateBtn.textContent = 'Atualizar';
+        updateBtn.onclick = (e) => {
+            e.stopPropagation();
+            loadConfig(config);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = 'Excluir';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            showConfirmDialog(index);
+        };
+
+        configElement.appendChild(configName);
+        configElement.appendChild(viewCurlBtn);
+        configElement.appendChild(updateBtn);
+        configElement.appendChild(deleteBtn);
+        container.appendChild(configElement);
+    });
+}
 let currentConfig = null;
 let conversationHistory = [];
 let knowledgeBases = [];
